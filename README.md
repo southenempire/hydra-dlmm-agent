@@ -5,7 +5,7 @@
 
 [![Hummingbot V2](https://img.shields.io/badge/Hummingbot-V2%20Controller-brightgreen)](https://hummingbot.org)
 [![Solana](https://img.shields.io/badge/Solana-Meteora%20DLMM-9945FF)](https://meteora.ag)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-7%2F7%20Passing-success)](https://github.com/southenempire/hydra-dlmm-agent)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-58%2F58%20Passing-success)](https://github.com/southenempire/hydra-dlmm-agent)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -13,6 +13,30 @@
 ## 🏛️ System Architecture
 
 ![Hydra-DLMM System Architecture](assets/hydra_dlmm_architecture.jpg)
+
+---
+
+## 🚀 Hummingbot V2 Integration
+
+This agent is built as a native **Hummingbot V2 Controller**, inheriting from `ControllerBase` and `ControllerConfigBase`. It translates our complex volatility and bin-shaping math directly into `ExecutorAction` commands that route through Hummingbot Gateway to Meteora.
+
+### 1. Installation
+Copy the controller file into your Hummingbot `controllers/market_making/` directory:
+```bash
+cp controllers/market_making/hydra_dlmm.py path/to/hummingbot/controllers/market_making/
+```
+
+### 2. Configuration
+Inside the Hummingbot CLI, create a new config. The UI will prompt you for the Meteora pool address, trading pair, and risk parameters:
+```bash
+create --controller-config market_making.hydra_dlmm
+```
+
+### 3. Execution
+Start the V2 framework:
+```bash
+start --v2 v2_with_controllers
+```
 
 ---
 
@@ -55,8 +79,9 @@ We simulated high-volatility Solana market conditions across 1,000 one-minute ti
 
 ```
 hydra-dlmm-agent/
-├── config/
-│   └── hydra_dlmm_config.py      # Pydantic configuration schema (Hummingbot V2)
+├── controllers/
+│   └── market_making/
+│       └── hydra_dlmm.py         # 🚀 Main Hummingbot V2 Controller & Config
 ├── strategy/
 │   ├── volatility_engine.py      # Garman-Klass & Parkinson intraday RV estimators
 │   ├── bin_shaper.py             # Gaussian Curve, BidAsk Skew, and Spot distribution generators
@@ -64,10 +89,10 @@ hydra-dlmm-agent/
 │   └── backtest_engine.py        # 1,000-tick comparative quant backtesting engine
 ├── executors/
 │   └── delta_hedge_executor.py   # Cross-venue perpetual micro-hedge order generator
-├── controllers/
-│   └── hydra_dlmm_controller.py  # Hummingbot V2 Strategy Controller
-├── tests/
-│   └── test_hydra_dlmm.py        # Automated test suite (7/7 passing)
+├── tests/                        # 58/58 Automated Tests
+│   ├── test_hydra_dlmm.py
+│   ├── test_hydra_dlmm_extended.py
+│   └── test_v2_controller.py     # Hummingbot V2 compliance tests
 ├── assets/
 │   └── hydra_dlmm_architecture.jpg # High-resolution architecture flowchart
 ├── run_agent.py                  # Live simulation runner with ASCII depth visualizer
@@ -81,9 +106,9 @@ hydra-dlmm-agent/
 
 ## 🧪 Running Unit Tests & Backtests
 
-**Run all 7 unit tests:**
+**Run the full test suite (58 tests covering math, logic, and V2 compliance):**
 ```bash
-python3 -m unittest -v tests/test_hydra_dlmm.py
+python3 -m unittest discover -s tests -p "test_*.py" -v
 ```
 
 **Run the 1,000-tick quant backtest benchmark:**
